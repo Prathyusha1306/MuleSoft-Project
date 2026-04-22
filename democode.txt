@@ -1,0 +1,36 @@
+<flow name="demoFlow">
+
+    <!-- HTTP Listener (Trigger) -->
+    <http:listener config-ref="HTTP_Listener_config" path="/getUser" doc:name="HTTP Listener"/>
+
+    <!-- Log Incoming Request -->
+    <logger message="Received Request: #[attributes.queryParams.accountID]" level="INFO"/>
+
+    <!-- Set Variable -->
+    <set-variable variableName="accountId" value="#[attributes.queryParams.accountID]"/>
+
+    <!-- Call External API -->
+    <http:request method="GET" url="https://jsonplaceholder.typicode.com/users/#[vars.accountId]" doc:name="HTTP Request"/>
+
+    <!-- Transform Data -->
+    <ee:transform doc:name="Transform Message">
+        <ee:message>
+            <ee:set-payload>
+%dw 2.0
+output application/json
+---
+{
+    id: payload.id,
+    name: payload.name,
+    email: payload.email
+}
+            </ee:set-payload>
+        </ee:message>
+    </ee:transform>
+
+    <!-- Log Response -->
+    <logger message="Response Sent: #[payload]" level="INFO"/>
+
+</flow>
+
+<name>PRATHYUSHA</name>
